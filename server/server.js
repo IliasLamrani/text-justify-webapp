@@ -1,22 +1,82 @@
 const express = require('express');
 const fs = require('fs');
 const justifyText = require('./modules/justify-text');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const app = express();
-app.use(express.text());
 
+app.use(express.text());
+app.use(express.json());
 
 const maxLineLength = 80;
+const maxFreeWords = 80000;
 const fileName = "./tmp"
 const encoding = "utf8"
 
-//TODO: use try - catch - throw
+const users = [];
 
-app.post('/api/justify', (req, res) => {
-    justifyText(fileName, req.body, maxLineLength);
-    const data = fs.readFileSync(fileName, encoding);
-    res.status(200).send(data);
-    fs.unlink('./tmp', err => console.log(err));
+function authenticationMiddleware(req, res, next) {
+    // the authorization header type for jwt should be 'Bearer'
+    // https://stackoverflow.com/questions/33265812/best-http-authorization-header-type-for-jwt
+    // so it will look like this -> Authorization: Bearer <token>
+    const header = req.headers['authorization'];
+    if (header) {
+        const userToken = header.split(' ')[1];
+        jwt.verify(userToken, process.env.JWT_SECRET_KEY, (err, user) => {
+            if (err) {
+                res.status(403).send('Invalid token');
+                return;
+            }
+            req.user = user;
+            next();
+        })
+    } else {
+        res.status(401).send('Please provide your token');
+    }
+}
+
+app.post('/api/justify', authenticationMiddleware, (req, res) => {
+    if (req.user.wordsJustifiedInDay > maxFreeWords) {
+        res.status(402).send('Payment required!');
+    } else {
+        justifyText(fileName, req.body, maxLineLength);
+        const data = fs.readFileSync(fileName, encoding);
+        res.status(200).send(data);
+
+        fs.unlink(fileName, err => {
+            if (err)
+                console.log(err);
+        });
+    }
+})
+
+app.post('/api/token', async (req, res) => {
+    if (!req.body.email) {
+        res.status(500).send("Please provide an email");
+    }
+    else if (!req.body.password) {
+        res.status(500).send("Please provide a password");
+    } else {
+        try {
+            if (users.find(user => user.email === req.body.email)) {
+                res.status(500).send("Your already have an account!");
+                return;
+            }
+            //hash user password and save his infos:
+            let salt = await bcrypt.genSalt();
+            let pwd = await bcrypt.hash(req.body.password, salt);
+            users.push({email: req.body.email, password: pwd, wordsJustifiedInDay: 0});
+
+            //generate user token:
+            const userToken = jwt.sign(users[users.length - 1], process.env.JWT_SECRET_KEY, {expiresIn: '24h'});
+
+            res.json({yourToken: userToken});
+        } catch {
+            res.status(500).send("Can't create token!");
+        }
+    }
 })
 
 app.listen(3000);
