@@ -18,10 +18,6 @@ const encoding = "utf8"
 
 const users = [];
 
-//TODO:
-//      - publish app with heroku
-//      - bonus: front-end
-
 function authenticationMiddleware(req, res, next) {
     // the authorization header type for jwt should be 'Bearer'
     // https://stackoverflow.com/questions/33265812/best-http-authorization-header-type-for-jwt
@@ -51,7 +47,7 @@ app.post('/api/justify', authenticationMiddleware, (req, res) => {
             const data = fs.readFileSync(fileName, encoding);
             res.status(200).send(data);
 
-            fs.unlink(fileName, err => {
+            fs.unlink(fileName, err => { //we don't need the output file anymore
                 if (err)
                     console.log(err);
             });

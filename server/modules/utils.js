@@ -16,7 +16,7 @@ class Utils {
                 else words[wordsIndex] += string[char];
             } else {
                 if (string[char - 1] !== ' ' && string[char - 1] !== undefined) { //skip multiple spaces
-                    words[wordsIndex] = words[wordsIndex].replace(/(\r\n|\n|\r)/gm, ""); //remove all line break
+                    words[wordsIndex] = words[wordsIndex].replace(/(\r\n|\n|\r)/gm, ""); //remove all line breaks
                     wordsIndex += 1;
                 }
             }
@@ -40,7 +40,7 @@ class Utils {
             if (line[index] == ' ') {
                 line = line.slice(0, index) + ' ' + line.slice(index);
                 nbSpaces -= 1;
-                index += 1; //we added a space but we want to keep the same index
+                index += 1; //to keep the same index
             }
         }
         return line;

@@ -18,7 +18,8 @@
   },
   "scripts": {
     "test": "nyc mocha",
-    "start": "node ./server/server.js"
+    "start": "node ./server/server.js",
+    "dev": "nodemon ./server/server.js"
   },
   "author": "Shelyp",
   "license": "ISC"
