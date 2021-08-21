@@ -3,6 +3,7 @@ const fs = require('fs');
 const justifyText = require('./modules/justify-text');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +17,11 @@ const fileName = "./tmp"
 const encoding = "utf8"
 
 const users = [];
+
+//TODO:
+//      - publish app with heroku
+//      - unit testing
+//      - bonus: front-end
 
 function authenticationMiddleware(req, res, next) {
     // the authorization header type for jwt should be 'Bearer'
@@ -38,17 +44,23 @@ function authenticationMiddleware(req, res, next) {
 }
 
 app.post('/api/justify', authenticationMiddleware, (req, res) => {
-    if (req.user.wordsJustifiedInDay > maxFreeWords) {
+    if (users[req.user.id].wordsJustifiedInDay + req.body.length > maxFreeWords) {
         res.status(402).send('Payment required!');
     } else {
-        justifyText(fileName, req.body, maxLineLength);
-        const data = fs.readFileSync(fileName, encoding);
-        res.status(200).send(data);
+        try {
+            justifyText(fileName, req.body, maxLineLength);
+            const data = fs.readFileSync(fileName, encoding);
+            res.status(200).send(data);
 
-        fs.unlink(fileName, err => {
-            if (err)
-                console.log(err);
-        });
+            fs.unlink(fileName, err => {
+                if (err)
+                    console.log(err);
+            });
+
+            users[req.user.id].wordsJustifiedInDay += req.body.length;
+        } catch {
+            res.status(500).send("Can't justify given text.");
+        }
     }
 })
 
@@ -61,18 +73,26 @@ app.post('/api/token', async (req, res) => {
     } else {
         try {
             if (users.find(user => user.email === req.body.email)) {
-                res.status(500).send("Your already have an account!");
-                return;
+                return res.status(500).send('You already have an account!');
             }
             //hash user password and save his infos:
             let salt = await bcrypt.genSalt();
             let pwd = await bcrypt.hash(req.body.password, salt);
-            users.push({email: req.body.email, password: pwd, wordsJustifiedInDay: 0});
+
+            users.push({
+                id: users.length,
+                email: req.body.email,
+                password: pwd,
+                wordsJustifiedInDay: 0,
+                self: this,
+                cron: cron.schedule('0 0 * * *', () => users[users.length - 1].wordsJustifiedInDay = 0) //every 24 hours
+            });
+            users[users.length - 1].cron.start();
 
             //generate user token:
-            const userToken = jwt.sign(users[users.length - 1], process.env.JWT_SECRET_KEY, {expiresIn: '24h'});
+            const userToken = jwt.sign(users[users.length - 1], process.env.JWT_SECRET_KEY);
 
-            res.json({yourToken: userToken});
+            res.status(200).send("This is your token. Keep it safely: " + userToken);
         } catch {
             res.status(500).send("Can't create token!");
         }

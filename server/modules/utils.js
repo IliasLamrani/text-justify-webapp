@@ -9,14 +9,16 @@ class Utils {
         let words = [];
         let wordsIndex = 0;
 
-        for (let char of string) {
-            if (char !== ' ') {
+        for (let char = 0; char < string.length; char++) {
+            if (string[char] !== ' ') {
                 if (words[wordsIndex] === undefined)
-                    words[wordsIndex] = char;
-                else words[wordsIndex] += char;
+                    words[wordsIndex] = string[char];
+                else words[wordsIndex] += string[char];
             } else {
-                words[wordsIndex] = words[wordsIndex].replace(/(\r\n|\n|\r)/gm, ""); //remove all whitespaces
-                wordsIndex += 1;
+                if (string[char - 1] !== ' ' && string[char - 1] !== undefined) { //skip multiple spaces
+                    words[wordsIndex] = words[wordsIndex].replace(/(\r\n|\n|\r)/gm, ""); //remove all line break
+                    wordsIndex += 1;
+                }
             }
         }
         return words;
