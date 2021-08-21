@@ -18,6 +18,10 @@ const encoding = "utf8"
 
 const users = [];
 
+app.get('/', (req, res) => {
+    res.send("Welcome to the justify-text API. For more infos, and to learn how to use it, please use the following link: https://github.com/Shelyp/text-justify-API")
+})
+
 function authenticationMiddleware(req, res, next) {
     // the authorization header type for jwt should be 'Bearer'
     // https://stackoverflow.com/questions/33265812/best-http-authorization-header-type-for-jwt
