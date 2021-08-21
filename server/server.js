@@ -20,7 +20,6 @@ const users = [];
 
 //TODO:
 //      - publish app with heroku
-//      - unit testing
 //      - bonus: front-end
 
 function authenticationMiddleware(req, res, next) {
@@ -66,10 +65,10 @@ app.post('/api/justify', authenticationMiddleware, (req, res) => {
 
 app.post('/api/token', async (req, res) => {
     if (!req.body.email) {
-        res.status(500).send("Please provide an email");
+        res.status(400).send("Please provide an email");
     }
     else if (!req.body.password) {
-        res.status(500).send("Please provide a password");
+        res.status(400).send("Please provide a password");
     } else {
         try {
             if (users.find(user => user.email === req.body.email)) {

@@ -35,7 +35,7 @@ class Utils {
         if (line.indexOf(' ') == -1)
             return line += ' '.repeat(nbSpaces);
         for (let index = 0; nbSpaces !== 0; index++) {
-            if (index >= line.length && nbSpaces !== 0)
+            if (index >= line.length)
                 index = 0;
             if (line[index] == ' ') {
                 line = line.slice(0, index) + ' ' + line.slice(index);
