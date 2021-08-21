@@ -65,7 +65,6 @@ describe('serverTesting', () => {
                 });
                 assert.equal('fail', 'Fail'); //failing test on purpose because axios should throw an error
             } catch(e) {
-                console.log(e.response.data);
                 assert.equal(e.response.status, 400);
             }
         })
@@ -120,7 +119,6 @@ describe('serverTesting', () => {
                 });
                 assert.equal(expectedOutput, justifyTextRes.data);
             } catch(e) {
-                console.log(e);
                 assert.equal('fail', 'Fail'); //failing test on purpose because axios shouldn't throw an error
             }
         })
