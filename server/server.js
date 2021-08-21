@@ -11,6 +11,7 @@ const app = express();
 app.use(express.text());
 app.use(express.json());
 
+const port = process.env.PORT || 3000;
 const maxLineLength = 80;
 const maxFreeWords = 80000;
 const fileName = "./tmp"
@@ -98,4 +99,4 @@ app.post('/api/token', async (req, res) => {
     }
 })
 
-app.listen(3000);
+app.listen(port);

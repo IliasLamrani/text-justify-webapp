@@ -9,7 +9,8 @@ This is juste a little project so the users are directly stored on the server an
 After submission, you'll receive a token. You have to provide it for each call to the ***/api/justify*** endpoint. A maximum of 8000 words can be justified per day. It will be reset automatically every 24 hours.
 The text you want to format must be sent as text/plain in your request.
 
-Unit tests can be launched with the ***npm test*** command but the server must be running. To do so, a ***JWT_SECRET_KEY*** environment variable must be set, and the ***npm start*** command executed.
+Unit tests can be launched with the ***npm test*** command but the server must be running. To do so, a ***JWT_SECRET_KEY*** environment variable must be set, and the ***npm start*** command executed. It will run on the port 3000.
+
 Tests on the server are also performed but the coverage is not available.
 
 ![alt text](https://github.com/Shelyp/text-justify-API/blob/master/misc/justify-text-coverage.png?raw=true)
