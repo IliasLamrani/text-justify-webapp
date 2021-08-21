@@ -58,7 +58,9 @@ app.post('/api/justify', authenticationMiddleware, (req, res) => {
             });
 
             users[req.user.id].wordsJustifiedInDay += req.body.length;
-        } catch {
+        } catch(e) {
+            console.log('-----------------JUSTIFY ERROR----------------');
+            console.log(e);
             res.status(500).send("Can't justify given text.");
         }
     }
@@ -93,7 +95,9 @@ app.post('/api/token', async (req, res) => {
             const userToken = jwt.sign(users[users.length - 1], process.env.JWT_SECRET_KEY);
 
             res.status(200).send("This is your token. Keep it safely: " + userToken);
-        } catch {
+        } catch(e) {
+            console.log('------------TOKEN CREATION ERROR------------ !')
+            console.log(e);
             res.status(500).send("Can't create token!");
         }
     }
