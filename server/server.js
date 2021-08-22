@@ -10,6 +10,9 @@ const app = express();
 
 app.use(express.text());
 app.use(express.json());
+app.use(express.static('app/'));
+app.use(express.static('app/login'));
+app.use(express.static('app/justify-text'));
 
 const port = process.env.PORT || 3000;
 const maxLineLength = 80;
@@ -20,7 +23,15 @@ const encoding = "utf8"
 const users = [];
 
 app.get('/', (req, res) => {
-    res.send("Welcome to the justify-text API. For more infos, and to learn how to use it, please use the following link: https://github.com/Shelyp/text-justify-API")
+    res.sendFile('app/login/login.html', {root: '.'});
+})
+
+app.get('/justify', (req, res) => {
+    res.sendFile('/app/justify-text/justify-text.html', {root: '.'});
+})
+
+app.get('/api/verify-token', authenticationMiddleware, (req, res) => {
+    res.status(200); //job was done in middleware
 })
 
 function authenticationMiddleware(req, res, next) {
@@ -59,8 +70,6 @@ app.post('/api/justify', authenticationMiddleware, (req, res) => {
 
             users[req.user.id].wordsJustifiedInDay += req.body.length;
         } catch(e) {
-            console.log('-----------------JUSTIFY ERROR----------------');
-            console.log(e);
             res.status(500).send("Can't justify given text.");
         }
     }
@@ -75,7 +84,7 @@ app.post('/api/token', async (req, res) => {
     } else {
         try {
             if (users.find(user => user.email === req.body.email)) {
-                return res.status(500).send('You already have an account!');
+                return res.status(303).send('You already have an account!');
             }
             //hash user password and save his infos:
             let salt = await bcrypt.genSalt();
@@ -94,10 +103,8 @@ app.post('/api/token', async (req, res) => {
             //generate user token:
             const userToken = jwt.sign(users[users.length - 1], process.env.JWT_SECRET_KEY);
 
-            res.status(200).send("This is your token. Keep it safely: " + userToken);
+            res.status(200).json(userToken);
         } catch(e) {
-            console.log('------------TOKEN CREATION ERROR------------ !')
-            console.log(e);
             res.status(500).send("Can't create token!");
         }
     }

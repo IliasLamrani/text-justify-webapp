@@ -1,0 +1,16 @@
+html {
+    overflow: hidden;
+}
+
+#blob {
+    position: absolute;
+    z-index: -1;
+    width: 40%;
+    height: auto;
+    left: 85%;
+    top: 70%;
+}
+
+#sign-up input[type=email] {
+    margin-bottom: 10px;
+}

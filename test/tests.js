@@ -80,7 +80,9 @@ describe('serverTesting', () => {
                         'Content-Type': 'application/json'
                     }
                 });
-                assert.equal(res.data.split(':')[0], 'This is your token. Keep it safely');
+                if (res.data) {
+                    assert.equal('success', 'success');
+                } else assert.equal('fail', 'Fail');
             } catch(e) {
                 assert.equal('fail', 'Fail'); //failing test on purpose because axios shouldn't throw an error
             }
@@ -114,7 +116,7 @@ describe('serverTesting', () => {
                 {
                     headers: {
                         'Content-Type': 'text/plain',
-                        'Authorization': 'Bearer ' + tokenRes.data.split(' ')[7]
+                        'Authorization': 'Bearer ' + tokenRes.data
                     }
                 });
                 assert.equal(expectedOutput, justifyTextRes.data);

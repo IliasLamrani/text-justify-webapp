@@ -1,0 +1,8 @@
+
+#blob {
+    position: absolute;
+    top: -120px;
+    left: -100px;
+    width: 400px;
+    z-index: -1;
+}
