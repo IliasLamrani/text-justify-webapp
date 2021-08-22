@@ -4,13 +4,14 @@ const forms = {
 }
 
 if (sessionStorage.getItem('userToken')) {
-    window.location = '/justify';
+    window.location = '/justify'; //if the user is logged in, send him to the justify text page
 }
 
 forms.signInForm.addEventListener('submit', e => {
     e.preventDefault();
     const elements = forms.signInForm.elements;
     const token = elements.item(0).value;
+    //check if the given token is linked to an account:
     fetch('/api/verify-token', {
         method: 'POST',
         headers: {

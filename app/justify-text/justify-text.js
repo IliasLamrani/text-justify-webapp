@@ -1,6 +1,6 @@
 const userToken = sessionStorage.getItem('userToken');
 if (userToken === undefined || userToken === null)
-    window.location = '/'
+    window.location = '/' //if the user is not logged in, send him to the loggin page
 
 const input = document.getElementById('user-input-form');
 input.addEventListener('submit', e => {
