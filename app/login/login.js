@@ -11,18 +11,17 @@ forms.signInForm.addEventListener('submit', e => {
     e.preventDefault();
     const elements = forms.signInForm.elements;
     const token = elements.item(0).value;
-
     fetch('/api/verify-token', {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token
         },
     })
+    .then(res => res.json())
     .then(e => {
-        if (e.status === 403)
-            console.log('Invalid token');
+        if (e.code === 403)
+            alert('Invalid token');
         else {
-            console.log('token is valid');
             sessionStorage.setItem('userToken', token);
             window.location = '/justify';
         }
@@ -46,9 +45,15 @@ forms.signUpForm.addEventListener('submit', e => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
-        sessionStorage.setItem('userToken', data);
-        window.location = '/justify';
+        if (data.code === 400 || data.code === 500) {
+            alert('Internal error!');
+        } else if (data.code === 303) {
+            alert('You already have an account');
+        } else {
+            console.log('Success:', data);
+            sessionStorage.setItem('userToken', data);
+            window.location = '/justify';
+        }
     })
 })
 

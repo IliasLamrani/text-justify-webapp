@@ -119,7 +119,7 @@ describe('serverTesting', () => {
                         'Authorization': 'Bearer ' + tokenRes.data
                     }
                 });
-                assert.equal(expectedOutput, justifyTextRes.data);
+                assert.equal(expectedOutput, justifyTextRes.data.message);
             } catch(e) {
                 assert.equal('fail', 'Fail'); //failing test on purpose because axios shouldn't throw an error
             }

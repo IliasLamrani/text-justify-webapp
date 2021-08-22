@@ -30,8 +30,8 @@ app.get('/justify', (req, res) => {
     res.sendFile('/app/justify-text/justify-text.html', {root: '.'});
 })
 
-app.get('/api/verify-token', authenticationMiddleware, (req, res) => {
-    res.status(200); //job was done in middleware
+app.post('/api/verify-token', authenticationMiddleware, (req, res) => {
+    res.status(200).json({message: 'Token is correct', code: 200}); //job was done in middleware
 })
 
 function authenticationMiddleware(req, res, next) {
@@ -43,25 +43,25 @@ function authenticationMiddleware(req, res, next) {
         const userToken = header.split(' ')[1];
         jwt.verify(userToken, process.env.JWT_SECRET_KEY, (err, user) => {
             if (err) {
-                res.status(403).send('Invalid token');
+                res.status(403).json({message: 'Invalid token', code: 403});
                 return;
             }
             req.user = user;
             next();
         })
     } else {
-        res.status(401).send('Please provide your token');
+        res.status(401).json({message: 'Please provide your token', code: 401});
     }
 }
 
 app.post('/api/justify', authenticationMiddleware, (req, res) => {
     if (users[req.user.id].wordsJustifiedInDay + req.body.length > maxFreeWords) {
-        res.status(402).send('Payment required!');
+        res.status(402).json({message: 'Payment required! You used your free 80 000 words', code: 402});
     } else {
         try {
             justifyText(fileName, req.body, maxLineLength);
             const data = fs.readFileSync(fileName, encoding);
-            res.status(200).send(data);
+            res.status(200).json({message: data, code: 200});
 
             fs.unlink(fileName, err => { //we don't need the output file anymore
                 if (err)
@@ -70,21 +70,21 @@ app.post('/api/justify', authenticationMiddleware, (req, res) => {
 
             users[req.user.id].wordsJustifiedInDay += req.body.length;
         } catch(e) {
-            res.status(500).send("Can't justify given text.");
+            res.status(500).json({message: "Can't justify given text.", code: 500});
         }
     }
 })
 
 app.post('/api/token', async (req, res) => {
     if (!req.body.email) {
-        res.status(400).send("Please provide an email");
+        res.status(400).json({message: "Please provide an email", code: 400});
     }
     else if (!req.body.password) {
-        res.status(400).send("Please provide a password");
+        res.status(400).json({message: "Please provide a password", code: 400});
     } else {
         try {
             if (users.find(user => user.email === req.body.email)) {
-                return res.status(303).send('You already have an account!');
+                return res.status(303).json({message: 'You already have an account!', code: 303});
             }
             //hash user password and save his infos:
             let salt = await bcrypt.genSalt();
@@ -105,7 +105,7 @@ app.post('/api/token', async (req, res) => {
 
             res.status(200).json(userToken);
         } catch(e) {
-            res.status(500).send("Can't create token!");
+            res.status(500).json({message: "Can't create token!", code: 500});
         }
     }
 })

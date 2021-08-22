@@ -15,8 +15,10 @@ input.addEventListener('submit', e => {
         },
         body: textToJustify
     })
-    .then(response => response.text())
-    .then(text => document.getElementById('output-text-area').value = text);
+    .then(response => response.json())
+    .then(obj => {
+        document.getElementById('output-text-area').value = obj.message;
+    });
     
 })
 
