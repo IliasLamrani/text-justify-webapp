@@ -90,15 +90,15 @@ app.post('/api/token', async (req, res) => {
             let salt = await bcrypt.genSalt();
             let pwd = await bcrypt.hash(req.body.password, salt);
 
+            const userID = users.length;
             users.push({
-                id: users.length,
+                id: userID,
                 email: req.body.email,
                 password: pwd,
                 wordsJustifiedInDay: 0,
-                self: this,
-                cron: cron.schedule('0 0 * * *', () => users[users.length - 1].wordsJustifiedInDay = 0) //every 24 hours
+                cron: cron.schedule('0 0 * * *', () => users[userID].wordsJustifiedInDay = 0) //every 24 hours
             });
-            users[users.length - 1].cron.start();
+            users[userID].cron.start();
 
             //generate user token:
             const userToken = jwt.sign(users[users.length - 1], process.env.JWT_SECRET_KEY);
